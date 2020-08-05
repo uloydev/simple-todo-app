@@ -14,6 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::namespace('Api')->group( function () {
+    Route::post('login', 'AuthController@login');
+    Route::post('register', 'AuthController@register');
+
+    Route::middleware('auth:api')->group( function () {
+        Route::get('todos/finished', 'TodoController@getFinished');
+        Route::post('todos/{todo}/finish', 'TodoController@setFinished');
+        Route::resource('todos', 'TodoController')->except(['create', 'edit']);
+    });
 });

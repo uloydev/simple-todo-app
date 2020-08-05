@@ -36,4 +36,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function todos()
+    {
+        return $this->hasMany('App\Todo');
+    }
+
+    public function finishedTodos()
+    {
+        return $this->hasMany('App\Todo')->where('is_finished', true);
+    }
 }
