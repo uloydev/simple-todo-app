@@ -34,6 +34,14 @@
 export default {
     data: {
         authPage: false
+    },
+    created(){
+        if (!localStorage.getItem('user') && !localStorage.getItem('token')){
+            if (this.$router.currentRoute.path != '/register'){
+                this.$router.replace('login');
+            }
+            this.authPage = true;
+        }
     }
 }
 </script>
