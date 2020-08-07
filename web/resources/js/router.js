@@ -4,10 +4,12 @@ import VueRouter from 'vue-router';
 import Login from './views/Login';
 import Register from './views/Register';
 import Home from './views/Home';
+import History from './views/History';
+import Profile from './views/Profile';
 
 Vue.use(VueRouter);
 
-const router = new VueRouter({
+export const router = new VueRouter({
     mode: 'history',
     routes: [
         {
@@ -19,6 +21,16 @@ const router = new VueRouter({
             path: '/register',
             name: 'register',
             component: Register
+        },
+        {
+            path: '/profile',
+            name: 'profile',
+            component: Profile
+        },
+        {
+            path: '/history',
+            name: 'history',
+            component: History
         },
         {
             path: '/',

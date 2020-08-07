@@ -24,6 +24,7 @@
         "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
+        "boxicons": "^2.0.5",
         "vue-router": "^3.4.0"
     }
 }

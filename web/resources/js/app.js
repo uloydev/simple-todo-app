@@ -1,7 +1,8 @@
 import './bootstrap';
 import Vue from 'vue';
-import App from './components/ExampleComponent';
-import router from './router';
+import App from './layouts/App';
+import {router} from './router';
+import 'boxicons';
 
 const vue = new Vue({
     router,
