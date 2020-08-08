@@ -52,7 +52,12 @@ class AuthController extends Controller
         $user->password = Hash::make($request->password);
         $user->api_token = Str::random(60);
         $user->remember_token = Str::random(10);
-        $user->save();
+        try {
+            $user->save();
+        } catch (\Throwable $th) {
+            $this->response['errors'] = ['email already exist please login'];
+            return response()->json($this->response, 422);
+        }
 
         $this->response['message'] = 'register success';
         $this->response['data'] = $user;

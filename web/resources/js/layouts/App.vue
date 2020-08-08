@@ -36,7 +36,7 @@ export default {
         authPage: false
     },
     created(){
-        if (!localStorage.getItem('user') && !localStorage.getItem('token')){
+        if (!localStorage.getItem('user') || !localStorage.getItem('token')){
             if (this.$router.currentRoute.path != '/register'){
                 this.$router.replace('login');
             }

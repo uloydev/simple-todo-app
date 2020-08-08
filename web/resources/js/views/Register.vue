@@ -5,19 +5,22 @@
         <form @submit.prevent="register">
             <div class="form-group">
                 <label for="inputName">Name</label>
-                <input type="text" class="form-control" id="inputName" v-model="name">
+                <input type="text" class="form-control" id="inputName" v-model="name" required>
             </div>
             <div class="form-group">
                 <label for="inputEmail">Email</label>
-                <input type="email" class="form-control" id="inputEmail" v-model="email">
+                <input type="email" class="form-control" id="inputEmail" v-model="email" required>
             </div>
             <div class="form-group">
                 <label for="inputPassword">Password</label>
-                <input type="password" class="form-control" id="inputPassword" v-model="password">
+                <input type="password" class="form-control" id="inputPassword" v-model="password" required>
             </div>
             <div class="form-group">
                 <label for="inputPasswordAgain">Password Again</label>
-                <input type="password" class="form-control" id="inputPasswordAgain" v-model="passwordAgain">
+                <input type="password" class="form-control" :class="{'is-invalid' : !isPasswordSame}" id="inputPasswordAgain" v-model="passwordAgain" required @input="checkPassword" aria-describedby="passwordAgainCheck">
+                <div class="invalid-feedback" id="passwordAgainCheck">
+                    password must be same!
+                </div>
             </div>
             <button type="submit" class="btn btn-primary btn-block">Submit</button>
             <div class="text-right mt-3">Already have account ? 
@@ -28,6 +31,7 @@
 </template>
 
 <script>
+    import Swal from 'sweetalert2';
 
     export default {
         data: function (){
@@ -35,14 +39,45 @@
                 name: '',
                 email: '',
                 password: '',
-                passwordAgain: ''
+                passwordAgain: '',
+                isPasswordSame: true
             }
         },
         components: {
         },
         methods: { 
             register: function () {
-                console.log(this.email);
+                let data = {
+                    name : this.name,
+                    email : this.email,
+                    password : this.password
+                };
+                if (!this.isPasswordSame){
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'password must be same!',
+                        icon: 'error'
+                    });
+                }else{
+                    axios.post('/api/register', data)
+                    .then(response => {
+                        if (response.status !== 201){
+                            Swal.fire('Error', 'can not register user!', 'error');
+                        }
+                    })
+                    .catch(error => {
+                        let errors = error.response.data.errors;
+                        let html = '<ul class="text-danger">';
+                        errors.forEach(item => {
+                            html += '<li>' + item + '</li>';
+                        });
+                        html += '</ul>';
+                        Swal.fire('Error', html, 'error');
+                    })
+                }
+            },
+            checkPassword: function () {
+                this.isPasswordSame = this.password == this.passwordAgain;
             }
         }
     }

@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "boxicons": "^2.0.5",
+        "sweetalert2": "^9.17.1",
         "vue-router": "^3.4.0"
     }
 }
