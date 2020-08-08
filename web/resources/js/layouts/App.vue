@@ -10,7 +10,7 @@
                             </div>
                         </div>
                         <div class="container my-3  ">
-                            <router-view></router-view>
+                            <router-view @updateNav="updateNav"></router-view>
                         </div>
                         <div class="row p-2 rounded-lg no-gutters" v-if="!authPage">
                             <div class="col-4 pr-2">
@@ -32,15 +32,27 @@
 
 <script>
 export default {
-    data: {
-        authPage: false
+    data: function () {
+        return {
+            authPage: false
+        };
     },
     created(){
-        if (!localStorage.getItem('user') || !localStorage.getItem('token')){
+        if (!localStorage.getItem('user')){
             if (this.$router.currentRoute.path != '/register'){
-                this.$router.replace('login');
+                this.$router.replace('/login');
             }
             this.authPage = true;
+        }else {
+            var authRoutes = ['/login', '/register'];
+            if( authRoutes.includes(this.$router.currentRoute.path)){
+                this.$router.replace('/');
+            }
+        }
+    },
+    methods: {
+        updateNav: function (val) {
+            this.authPage = val;
         }
     }
 }

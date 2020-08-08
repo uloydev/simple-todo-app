@@ -63,9 +63,15 @@
                     .then(response => {
                         if (response.status !== 201){
                             Swal.fire('Error', 'can not register user!', 'error');
+                        }else {
+                            localStorage.setItem('user', response.data.data);
+                            Swal.fire('Success', 'register success!', 'success');
+                            this.$emit('updateNav', false);
+                            this.$router.replace('/');
                         }
                     })
                     .catch(error => {
+                        console.log(error.response);
                         let errors = error.response.data.errors;
                         let html = '<ul class="text-danger">';
                         errors.forEach(item => {
@@ -73,7 +79,7 @@
                         });
                         html += '</ul>';
                         Swal.fire('Error', html, 'error');
-                    })
+                    });
                 }
             },
             checkPassword: function () {

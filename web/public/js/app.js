@@ -2030,16 +2030,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  data: {
-    authPage: false
+  data: function data() {
+    return {
+      authPage: false
+    };
   },
   created: function created() {
-    if (!localStorage.getItem('user') || !localStorage.getItem('token')) {
+    if (!localStorage.getItem('user')) {
       if (this.$router.currentRoute.path != '/register') {
-        this.$router.replace('login');
+        this.$router.replace('/login');
       }
 
       this.authPage = true;
+    } else {
+      var authRoutes = ['/login', '/register'];
+
+      if (authRoutes.includes(this.$router.currentRoute.path)) {
+        this.$router.replace('/');
+      }
+    }
+  },
+  methods: {
+    updateNav: function updateNav(val) {
+      this.authPage = val;
     }
   }
 });
@@ -2109,6 +2122,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -2130,6 +2145,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2140,7 +2156,34 @@ __webpack_require__.r(__webpack_exports__);
   components: {},
   methods: {
     login: function login() {
-      console.log(this.email + "   ---   " + this.password);
+      var _this = this;
+
+      var data = {
+        email: this.email,
+        password: this.password
+      };
+      axios.post('/api/login', data).then(function (response) {
+        if (response.status !== 200) {
+          sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', 'can not login user!', 'error');
+        } else {
+          localStorage.setItem('user', JSON.stringify(response.data.data));
+          sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Success', 'login success!', 'success');
+
+          _this.$emit('updateNav', false);
+
+          _this.$router.replace('/');
+        }
+      })["catch"](function (error) {
+        if (error.response.data.errors) {
+          var errors = error.response.data.errors;
+          var html = '<ul class="text-danger">';
+          errors.forEach(function (item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', html, 'error');
+        }
+      });
     }
   }
 });
@@ -2174,10 +2217,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  created: function created() {
+    this.user = JSON.parse(localStorage.getItem('user'));
+  },
+  data: function data() {
+    return {
+      user: null
+    };
+  },
   components: {
     ProfileItem: _components_ProfileItem__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  methods: {
+    logout: function logout() {
+      localStorage.removeItem('user');
+      this.$emit('updateNav', true);
+      this.$router.replace('/login');
+    },
+    dateString: function dateString(text) {
+      return new Date(text).toDateString();
+    }
   }
 });
 
@@ -2240,6 +2302,8 @@ __webpack_require__.r(__webpack_exports__);
   components: {},
   methods: {
     register: function register() {
+      var _this = this;
+
       var data = {
         name: this.name,
         email: this.email,
@@ -2256,8 +2320,16 @@ __webpack_require__.r(__webpack_exports__);
         axios.post('/api/register', data).then(function (response) {
           if (response.status !== 201) {
             sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', 'can not register user!', 'error');
+          } else {
+            localStorage.setItem('user', response.data.data);
+            sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Success', 'register success!', 'success');
+
+            _this.$emit('updateNav', false);
+
+            _this.$router.replace('/');
           }
         })["catch"](function (error) {
+          console.log(error.response);
           var errors = error.response.data.errors;
           var html = '<ul class="text-danger">';
           errors.forEach(function (item) {
@@ -41947,7 +42019,7 @@ var render = function() {
             _c(
               "div",
               { staticClass: "container my-3  " },
-              [_c("router-view")],
+              [_c("router-view", { on: { updateNav: _vm.updateNav } })],
               1
             ),
             _vm._v(" "),
@@ -42236,14 +42308,19 @@ var render = function() {
       "div",
       { staticClass: "container bg-light py-3 my-4 rounded-lg" },
       [
-        _c("profile-item", { attrs: { fieldName: "Name", value: "UloyDev" } }),
-        _vm._v(" "),
         _c("profile-item", {
-          attrs: { fieldName: "Email", value: "uloydev@gmail.com" }
+          attrs: { fieldName: "Name", value: _vm.user.name }
         }),
         _vm._v(" "),
         _c("profile-item", {
-          attrs: { fieldName: "Joined At", value: "1-1-2020" }
+          attrs: { fieldName: "Email", value: _vm.user.email }
+        }),
+        _vm._v(" "),
+        _c("profile-item", {
+          attrs: {
+            fieldName: "Joined At",
+            value: _vm.dateString(_vm.user.created_at)
+          }
         }),
         _vm._v(" "),
         _c("profile-item", {
@@ -42252,7 +42329,16 @@ var render = function() {
         _vm._v(" "),
         _c("profile-item", {
           attrs: { fieldName: "TodosFinished", value: "268" }
-        })
+        }),
+        _vm._v(" "),
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-danger d-block mx-auto",
+            on: { click: _vm.logout }
+          },
+          [_vm._v("Logout")]
+        )
       ],
       1
     )

@@ -20,6 +20,7 @@
 </template>
 
 <script>
+    import Swal from 'sweetalert2';
 
     export default {
         data: function () {
@@ -32,7 +33,32 @@
         },
         methods: { 
             login: function () {
-                console.log(this.email + "   ---   " + this.password);
+                let data = {
+                    email : this.email,
+                    password : this.password
+                };
+                axios.post('/api/login', data)
+                .then(response => {
+                    if (response.status !== 200){
+                        Swal.fire('Error', 'can not login user!', 'error');
+                    }else {
+                        localStorage.setItem('user', JSON.stringify(response.data.data));
+                        Swal.fire('Success', 'login success!', 'success');
+                        this.$emit('updateNav', false);
+                        this.$router.replace('/');
+                    }
+                })
+                .catch(error => {
+                    if (error.response.data.errors){
+                        let errors = error.response.data.errors;
+                        let html = '<ul class="text-danger">';
+                        errors.forEach(item => {
+                            html += '<li>' + item + '</li>';
+                        });
+                        html += '</ul>';
+                        Swal.fire('Error', html, 'error');
+                    }
+                });
             }
         }
     }
