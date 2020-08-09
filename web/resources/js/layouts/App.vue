@@ -6,7 +6,7 @@
                     <div class="container p-3">
                         <div class="row p-2 no-gutters bg-primary rounded-lg">
                             <div class="col">
-                                <h3 class="text-bold text-white font-weight-bold m-0">Simple TODO App</h3>
+                                <h3 class="text-bold text-white font-weight-bold m-0">Simple TODO App - {{$route.name}}</h3>
                             </div>
                         </div>
                         <div class="container my-3  ">

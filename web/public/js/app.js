@@ -2038,6 +2038,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -2051,7 +2053,47 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['todo', 'token'],
+  methods: {
+    deleteTodo: function deleteTodo() {
+      var _this = this;
+
+      sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(function (result) {
+        if (result.value) {
+          axios["delete"]('/api/todos/' + _this.todo.id, {
+            headers: {
+              Authorization: 'Bearer ' + _this.token
+            }
+          }).then(function (response) {
+            sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Deleted!', 'Todo has been deleted.', 'success');
+
+            _this.$emit('getTodos');
+          })["catch"](function (error) {
+            if (error.response.data.errors) {
+              var errors = error.response.data.errors;
+              var html = '<ul class="text-danger">';
+              errors.forEach(function (item) {
+                html += '<li>' + item + '</li>';
+              });
+              html += '</ul>';
+              sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', html, 'error');
+            }
+          });
+        }
+      });
+    }
+  }
+});
 
 /***/ }),
 
@@ -2136,6 +2178,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_TodoHistoryComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../components/TodoHistoryComponent */ "./resources/js/components/TodoHistoryComponent.vue");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -2143,9 +2187,44 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+  mounted: function mounted() {
+    this.user = JSON.parse(localStorage.getItem('user'));
+    this.getTodos();
+  },
+  data: function data() {
+    return {
+      todos: [],
+      user: null
+    };
+  },
   components: {
     TodoHistoryComponent: _components_TodoHistoryComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  methods: {
+    getTodos: function getTodos() {
+      var _this = this;
+
+      var data = this.apiData;
+      axios.get('/api/todos/finished', {
+        headers: {
+          Authorization: 'Bearer ' + this.user.api_token
+        }
+      }).then(function (response) {
+        _this.todos = response.data.data;
+      })["catch"](function (error) {
+        if (error.response.data.errors) {
+          var errors = error.response.data.errors;
+          var html = '<ul class="text-danger">';
+          errors.forEach(function (item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Error', html, 'error');
+        }
+      });
+    }
   }
 });
 
@@ -42180,12 +42259,14 @@ var render = function() {
     "div",
     { staticClass: "row no-gutters bg-light shadow-sm rounded-lg p-3 mb-3" },
     [
-      _vm._m(0),
+      _c("div", { staticClass: "col-11" }, [
+        _c("p", { staticClass: "m-0" }, [_vm._v(_vm._s(_vm.todo.body))])
+      ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-1 align-self-center" }, [
         _c(
           "button",
-          { staticClass: "btn btn-danger" },
+          { staticClass: "btn btn-danger", on: { click: _vm.deleteTodo } },
           [
             _c("box-icon", {
               attrs: { name: "trash", animation: "tada", color: "white" }
@@ -42197,20 +42278,7 @@ var render = function() {
     ]
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-11" }, [
-      _c("p", { staticClass: "m-0" }, [
-        _vm._v(
-          "Lorem ipsum dolor sit amet consectetur, adipisicing elit. A repellat aliquam tempore? Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint, assumenda rerum! Porro."
-        )
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -42237,7 +42305,21 @@ var render = function() {
       _c("div", { staticClass: "col-md-8" }, [
         _c("div", { staticClass: "card" }, [
           _c("div", { staticClass: "container p-3" }, [
-            _vm._m(0),
+            _c(
+              "div",
+              { staticClass: "row p-2 no-gutters bg-primary rounded-lg" },
+              [
+                _c("div", { staticClass: "col" }, [
+                  _c(
+                    "h3",
+                    {
+                      staticClass: "text-bold text-white font-weight-bold m-0"
+                    },
+                    [_vm._v("Simple TODO App - " + _vm._s(_vm.$route.name))]
+                  )
+                ])
+              ]
+            ),
             _vm._v(" "),
             _c(
               "div",
@@ -42303,26 +42385,7 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      { staticClass: "row p-2 no-gutters bg-primary rounded-lg" },
-      [
-        _c("div", { staticClass: "col" }, [
-          _c(
-            "h3",
-            { staticClass: "text-bold text-white font-weight-bold m-0" },
-            [_vm._v("Simple TODO App")]
-          )
-        ])
-      ]
-    )
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -42344,7 +42407,18 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "p-2" }, [_c("todo-history-component")], 1)
+  return _c(
+    "div",
+    { staticClass: "p-2" },
+    _vm._l(_vm.todos, function(todo) {
+      return _c("todo-history-component", {
+        key: todo.id,
+        attrs: { todo: todo, token: _vm.user.api_token },
+        on: { getTodos: _vm.getTodos }
+      })
+    }),
+    1
+  )
 }
 var staticRenderFns = []
 render._withStripped = true
