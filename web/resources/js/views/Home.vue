@@ -2,7 +2,7 @@
 
 <template>
     <div class="p-2">
-        <button class="btn btn-block btn-info mb-3" data-toggle="modal" data-target="#createTodo">Create New Todo</button>
+        <button class="btn btn-block btn-info mb-3 text-white font-weight-bold" data-toggle="modal" data-target="#createTodo" @click="updateFormState(false)">Create New Todo</button>
         <todo-component 
             v-for="todo in todos" 
             :key="todo.id" 
@@ -40,7 +40,8 @@
 </template>
 
 <script>
-    import TodoComponent from './../components/TodoComponent'  
+    import TodoComponent from './../components/TodoComponent';
+    import Swal from 'sweetalert2';
     
     export default {
         mounted(){
@@ -75,7 +76,6 @@
                     this.todos = response.data.data;
                 })
                 .catch(error => {
-                    console.log(error.response)
                     if (error.response.data.errors){
                         let errors = error.response.data.errors;
                         let html = '<ul class="text-danger">';
@@ -94,7 +94,6 @@
                 $('#createTodo').modal('hide');
                 axios.post('/api/todos',data)
                 .then(response => {
-                    this.todos.push(response.data.data);
                     this.getTodos();
                     Swal.fire('Success', response.data.message, 'success');
                 })

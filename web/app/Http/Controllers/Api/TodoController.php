@@ -25,7 +25,7 @@ class TodoController extends Controller
     {
         $user = Auth::user();
         $this->response['message'] = 'success to get todos';
-        $this->response['data'] = $user->todos;
+        $this->response['data'] = $user->todos->where('is_finished', false);
         return response()->json($this->response, 200);
     }
 

@@ -9,7 +9,7 @@
                     <box-icon name='menu' color="white"></box-icon>
                 </button>
                 <div class="dropdown-menu p-3 text-center">
-                    <button class="dropdown-item bg-success my-2">
+                    <button class="dropdown-item bg-success my-2" @click="finishTodo">
                         <box-icon name='check' animation='tada' ></box-icon> Finish
                     </button>
                     <button class="dropdown-item bg-warning my-2">
@@ -67,6 +67,29 @@
                                 Swal.fire('Error', html, 'error');
                             }
                         });
+                    }
+                });
+            },
+            finishTodo () {
+                axios.post('/api/todos/' + this.todo.id + '/finish', {
+                    api_token: this.token
+                }).then(response => {
+                    Swal.fire(
+                        'Success',
+                        'Todo Finished',
+                        'success'
+                    );
+                    this.$emit('getTodos');
+                }).catch(error => {
+                    console.log(error.response)
+                    if (error.response.data.errors){
+                        let errors = error.response.data.errors;
+                        let html = '<ul class="text-danger">';
+                        errors.forEach(item => {
+                            html += '<li>' + item + '</li>';
+                        });
+                        html += '</ul>';
+                        Swal.fire('Error', html, 'error');
                     }
                 });
             }

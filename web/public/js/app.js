@@ -2000,6 +2000,29 @@ __webpack_require__.r(__webpack_exports__);
           });
         }
       });
+    },
+    finishTodo: function finishTodo() {
+      var _this2 = this;
+
+      axios.post('/api/todos/' + this.todo.id + '/finish', {
+        api_token: this.token
+      }).then(function (response) {
+        sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Success', 'Todo Finished', 'success');
+
+        _this2.$emit('getTodos');
+      })["catch"](function (error) {
+        console.log(error.response);
+
+        if (error.response.data.errors) {
+          var errors = error.response.data.errors;
+          var html = '<ul class="text-danger">';
+          errors.forEach(function (item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', html, 'error');
+        }
+      });
     }
   }
 });
@@ -2138,6 +2161,8 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_TodoComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./../components/TodoComponent */ "./resources/js/components/TodoComponent.vue");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_1__);
 //
 //
 //
@@ -2179,6 +2204,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
@@ -2213,8 +2239,6 @@ __webpack_require__.r(__webpack_exports__);
       }).then(function (response) {
         _this.todos = response.data.data;
       })["catch"](function (error) {
-        console.log(error.response);
-
         if (error.response.data.errors) {
           var errors = error.response.data.errors;
           var html = '<ul class="text-danger">';
@@ -2222,7 +2246,7 @@ __webpack_require__.r(__webpack_exports__);
             html += '<li>' + item + '</li>';
           });
           html += '</ul>';
-          Swal.fire('Error', html, 'error');
+          sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Error', html, 'error');
         }
       });
     },
@@ -2234,11 +2258,9 @@ __webpack_require__.r(__webpack_exports__);
       this.inputBody = '';
       $('#createTodo').modal('hide');
       axios.post('/api/todos', data).then(function (response) {
-        _this2.todos.push(response.data.data);
-
         _this2.getTodos();
 
-        Swal.fire('Success', response.data.message, 'success');
+        sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Success', response.data.message, 'success');
       })["catch"](function (error) {
         if (error.response.data.errors) {
           var errors = error.response.data.errors;
@@ -2247,7 +2269,7 @@ __webpack_require__.r(__webpack_exports__);
             html += '<li>' + item + '</li>';
           });
           html += '</ul>';
-          Swal.fire('Error', html, 'error');
+          sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Error', html, 'error');
         }
       });
     },
@@ -42057,7 +42079,10 @@ var render = function() {
           _c("div", { staticClass: "dropdown-menu p-3 text-center" }, [
             _c(
               "button",
-              { staticClass: "dropdown-item bg-success my-2" },
+              {
+                staticClass: "dropdown-item bg-success my-2",
+                on: { click: _vm.finishTodo }
+              },
               [
                 _c("box-icon", { attrs: { name: "check", animation: "tada" } }),
                 _vm._v(" Finish\n                ")
@@ -42316,8 +42341,14 @@ var render = function() {
       _c(
         "button",
         {
-          staticClass: "btn btn-block btn-info mb-3",
-          attrs: { "data-toggle": "modal", "data-target": "#createTodo" }
+          staticClass:
+            "btn btn-block btn-info mb-3 text-white font-weight-bold",
+          attrs: { "data-toggle": "modal", "data-target": "#createTodo" },
+          on: {
+            click: function($event) {
+              return _vm.updateFormState(false)
+            }
+          }
         },
         [_vm._v("Create New Todo")]
       ),
