@@ -64,7 +64,7 @@
                         if (response.status !== 201){
                             Swal.fire('Error', 'can not register user!', 'error');
                         }else {
-                            localStorage.setItem('user', response.data.data);
+                            localStorage.setItem('user', JSON.stringify(response.data.data));
                             Swal.fire('Success', 'register success!', 'success');
                             this.$emit('updateNav', false);
                             this.$router.replace('/');

@@ -9,8 +9,8 @@
             <profile-item fieldName="Name" :value="user.name"></profile-item>
             <profile-item fieldName="Email" :value="user.email"></profile-item>
             <profile-item fieldName="Joined At" :value="dateString(user.created_at)"></profile-item>
-            <profile-item fieldName="TodosCreated" value="293"></profile-item>
-            <profile-item fieldName="TodosFinished" value="268"></profile-item>
+            <profile-item fieldName="TodosCreated" :value="todoCreated"></profile-item>
+            <profile-item fieldName="TodosFinished" :value="todoFinished"></profile-item>
             <button class="btn btn-danger d-block mx-auto" @click="logout">Logout</button>
         </div>
     </div>
@@ -21,10 +21,13 @@
     export default {
         created(){
             this.user = JSON.parse(localStorage.getItem('user'));
+            getStats();
         },
         data: function () {
             return {
                 user: null,
+                todoCreated: 0,
+                todoFinished: 0,
             };
         },
         components: {
@@ -38,6 +41,27 @@
             },
             dateString (text) {
                 return new Date(text).toDateString()
+            },
+            getStats () {
+                var data = {
+                    api_token: user.api_token
+                };
+                axios.get('/api/todos/stats', data).
+                then(response => {
+                    this.todoCreated = response.data.data.todoCount;
+                    this.todoFinished = response.data.data.finishedCount;
+                })
+                .catch(error => {
+                    if (error.response.data.errors){
+                        let errors = error.response.data.errors;
+                        let html = '<ul class="text-danger">';
+                        errors.forEach(item => {
+                            html += '<li>' + item + '</li>';
+                        });
+                        html += '</ul>';
+                        Swal.fire('Error', html, 'error');
+                    }
+                });
             }
         }
     }

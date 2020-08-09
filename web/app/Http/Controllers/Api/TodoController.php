@@ -150,4 +150,18 @@ class TodoController extends Controller
         $this->response['data'] = $todo;
         return response()->json($this->response, 200);
     }
+
+    public function stats()
+    {
+        $user = Auth::user();
+        $todos = $user->todos;
+        $todoCount = $todos->count();
+        $finishedCount = $todos->where('finished_at', '!=', null)->count();
+        $this->response['message'] = "success to get todo stats";
+        $this->response['data'] = [
+            'todoCount' => $todoCount,
+            'finishedCount' => $finishedCount
+        ];
+        return response()->json($this->response, 200);
+    }
 }

@@ -1958,7 +1958,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-/* harmony default export */ __webpack_exports__["default"] = ({});
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['todo']
+});
 
 /***/ }),
 
@@ -2104,10 +2106,104 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  mounted: function mounted() {
+    this.user = JSON.parse(localStorage.getItem('user'));
+    this.apiData.api_token = this.user.api_token;
+    this.getTodos();
+  },
+  data: function data() {
+    return {
+      todos: [],
+      inputBody: '',
+      apiData: {
+        api_token: ''
+      },
+      user: null,
+      isUpdateForm: false
+    };
+  },
   components: {
     TodoComponent: _components_TodoComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  methods: {
+    getTodos: function getTodos() {
+      var _this = this;
+
+      var data = this.apiData;
+      console.log(data);
+      axios.get('/api/todos', {
+        headers: {
+          Authorization: 'Bearer ' + this.user.api_token
+        }
+      }).then(function (response) {
+        _this.todos = response.data.data;
+        console.log(_this.todos);
+      })["catch"](function (error) {
+        console.log(error.response);
+
+        if (error.response.data.errors) {
+          var errors = error.response.data.errors;
+          var html = '<ul class="text-danger">';
+          errors.forEach(function (item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          Swal.fire('Error', html, 'error');
+        }
+      });
+    },
+    createTodo: function createTodo() {
+      var _this2 = this;
+
+      var data = this.apiData;
+      data.body = this.inputBody;
+      this.inputBody = '';
+      $('#createTodo').modal('hide');
+      axios.post('/api/todos', data).then(function (response) {
+        _this2.todos.push(response.data.data);
+
+        _this2.getTodos();
+
+        Swal.fire('Success', response.data.message, 'success');
+      })["catch"](function (error) {
+        if (error.response.data.errors) {
+          var errors = error.response.data.errors;
+          var html = '<ul class="text-danger">';
+          errors.forEach(function (item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          Swal.fire('Error', html, 'error');
+        }
+      });
+    },
+    updateTodo: function updateTodo() {},
+    showModal: function showModal() {}
   }
 });
 
@@ -2222,10 +2318,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   created: function created() {
     this.user = JSON.parse(localStorage.getItem('user'));
+    getStats();
   },
   data: function data() {
     return {
-      user: null
+      user: null,
+      todoCreated: 0,
+      todoFinished: 0
     };
   },
   components: {
@@ -2239,6 +2338,27 @@ __webpack_require__.r(__webpack_exports__);
     },
     dateString: function dateString(text) {
       return new Date(text).toDateString();
+    },
+    getStats: function getStats() {
+      var _this = this;
+
+      var data = {
+        api_token: user.api_token
+      };
+      axios.get('/api/todos/stats', data).then(function (response) {
+        _this.todoCreated = response.data.data.todoCount;
+        _this.todoFinished = response.data.data.finishedCount;
+      })["catch"](function (error) {
+        if (error.response.data.errors) {
+          var errors = error.response.data.errors;
+          var html = '<ul class="text-danger">';
+          errors.forEach(function (item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          Swal.fire('Error', html, 'error');
+        }
+      });
     }
   }
 });
@@ -2321,7 +2441,7 @@ __webpack_require__.r(__webpack_exports__);
           if (response.status !== 201) {
             sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', 'can not register user!', 'error');
           } else {
-            localStorage.setItem('user', response.data.data);
+            localStorage.setItem('user', JSON.stringify(response.data.data));
             sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Success', 'register success!', 'success');
 
             _this.$emit('updateNav', false);
@@ -41860,7 +41980,9 @@ var render = function() {
     "div",
     { staticClass: "row no-gutters bg-light shadow-sm rounded-lg p-3 mb-3" },
     [
-      _vm._m(0),
+      _c("div", { staticClass: "col-11" }, [
+        _c("p", { staticClass: "m-0" }, [_vm._v(_vm._s(_vm.todo.body))])
+      ]),
       _vm._v(" "),
       _c("div", { staticClass: "col-1 align-self-center" }, [
         _c("div", { staticClass: "btn-group" }, [
@@ -41918,20 +42040,7 @@ var render = function() {
     ]
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col-11" }, [
-      _c("p", { staticClass: "m-0" }, [
-        _vm._v(
-          "Lorem ipsum dolor sit amet consectetur, adipisicing elit. A repellat aliquam tempore? Lorem ipsum dolor sit amet consectetur adipisicing elit. Sint, assumenda rerum! Porro."
-        )
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 
@@ -42149,16 +42258,148 @@ var render = function() {
     "div",
     { staticClass: "p-2" },
     [
-      _c("todo-component"),
+      _c(
+        "button",
+        {
+          staticClass: "btn btn-block btn-info mb-3",
+          attrs: { "data-toggle": "modal", "data-target": "#createTodo" }
+        },
+        [_vm._v("Create New Todo")]
+      ),
       _vm._v(" "),
-      _c("todo-component"),
+      _vm._l(_vm.todos, function(todo) {
+        return _c("todo-component", { key: todo.id, attrs: { todo: todo } })
+      }),
       _vm._v(" "),
-      _c("todo-component")
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "createTodo",
+            "data-backdrop": "static",
+            "data-keyboard": "false",
+            tabindex: "-1",
+            "aria-labelledby": "createTodoLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c("div", { staticClass: "modal-dialog" }, [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "form-group" }, [
+                  _c("label", { attrs: { for: "inputBody" } }, [
+                    _vm._v("Todo")
+                  ]),
+                  _vm._v(" "),
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.inputBody,
+                        expression: "inputBody"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", id: "inputBody", required: "" },
+                    domProps: { value: _vm.inputBody },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.inputBody = $event.target.value
+                      }
+                    }
+                  })
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { type: "button", "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Cancel")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: !_vm.isUpdateForm,
+                        expression: "!isUpdateForm"
+                      }
+                    ],
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: { click: _vm.createTodo }
+                  },
+                  [_vm._v("Submit")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.isUpdateForm,
+                        expression: "isUpdateForm"
+                      }
+                    ],
+                    staticClass: "btn btn-primary",
+                    attrs: { type: "button" },
+                    on: { click: _vm.updateTodo }
+                  },
+                  [_vm._v("Update")]
+                )
+              ])
+            ])
+          ])
+        ]
+      )
     ],
-    1
+    2
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "createTodoLabel" } },
+        [_vm._v("Modal title")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  }
+]
 render._withStripped = true
 
 
@@ -42324,11 +42565,11 @@ var render = function() {
         }),
         _vm._v(" "),
         _c("profile-item", {
-          attrs: { fieldName: "TodosCreated", value: "293" }
+          attrs: { fieldName: "TodosCreated", value: _vm.todoCreated }
         }),
         _vm._v(" "),
         _c("profile-item", {
-          attrs: { fieldName: "TodosFinished", value: "268" }
+          attrs: { fieldName: "TodosFinished", value: _vm.todoFinished }
         }),
         _vm._v(" "),
         _c(

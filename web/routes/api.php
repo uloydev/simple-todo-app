@@ -20,6 +20,7 @@ Route::namespace('Api')->group( function () {
 
     Route::middleware('auth:api')->group( function () {
         Route::get('todos/finished', 'TodoController@getFinished');
+        Route::get('todos/stats', 'TodoController@stats');
         Route::post('todos/{todo}/finish', 'TodoController@setFinished');
         Route::resource('todos', 'TodoController')->except(['create', 'edit']);
     });
