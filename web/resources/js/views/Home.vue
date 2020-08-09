@@ -3,7 +3,15 @@
 <template>
     <div class="p-2">
         <button class="btn btn-block btn-info mb-3" data-toggle="modal" data-target="#createTodo">Create New Todo</button>
-        <todo-component v-for="todo in todos" :key="todo.id" :todo="todo"></todo-component>
+        <todo-component 
+            v-for="todo in todos" 
+            :key="todo.id" 
+            :todo="todo"
+            @updateFormState="updateFormState"
+            @showModal="showModal"
+            @getTodos="getTodos"
+            :token="user.api_token"
+        ></todo-component>
 
         <div class="modal fade" id="createTodo" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="createTodoLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -65,7 +73,6 @@
                 })
                 .then(response => {
                     this.todos = response.data.data;
-                    console.log(this.todos)
                 })
                 .catch(error => {
                     console.log(error.response)
@@ -103,12 +110,15 @@
                     }
                 });
             },
-            updateTodo () {
+            updateTodo (todo) {
 
             },
             showModal () {
 
             },
+            updateFormState (val) {
+                this.isUpdateForm = val;
+            }
         }
     }
 </script>

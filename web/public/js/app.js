@@ -1932,6 +1932,8 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -1958,8 +1960,48 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['todo']
+  props: ['todo', 'token'],
+  methods: {
+    deleteTodo: function deleteTodo() {
+      var _this = this;
+
+      sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+      }).then(function (result) {
+        if (result.value) {
+          axios["delete"]('/api/todos/' + _this.todo.id, {
+            headers: {
+              Authorization: 'Bearer ' + _this.token
+            }
+          }).then(function (response) {
+            sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Deleted!', 'Todo has been deleted.', 'success');
+
+            _this.$emit('getTodos');
+          })["catch"](function (error) {
+            console.log(error.response);
+
+            if (error.response.data.errors) {
+              var errors = error.response.data.errors;
+              var html = '<ul class="text-danger">';
+              errors.forEach(function (item) {
+                html += '<li>' + item + '</li>';
+              });
+              html += '</ul>';
+              sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', html, 'error');
+            }
+          });
+        }
+      });
+    }
+  }
 });
 
 /***/ }),
@@ -2129,6 +2171,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
@@ -2162,7 +2212,6 @@ __webpack_require__.r(__webpack_exports__);
         }
       }).then(function (response) {
         _this.todos = response.data.data;
-        console.log(_this.todos);
       })["catch"](function (error) {
         console.log(error.response);
 
@@ -2202,8 +2251,11 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    updateTodo: function updateTodo() {},
-    showModal: function showModal() {}
+    updateTodo: function updateTodo(todo) {},
+    showModal: function showModal() {},
+    updateFormState: function updateFormState(val) {
+      this.isUpdateForm = val;
+    }
   }
 });
 
@@ -42027,7 +42079,10 @@ var render = function() {
             _vm._v(" "),
             _c(
               "button",
-              { staticClass: "dropdown-item bg-danger my-2" },
+              {
+                staticClass: "dropdown-item bg-danger my-2",
+                on: { click: _vm.deleteTodo }
+              },
               [
                 _c("box-icon", { attrs: { name: "trash", animation: "tada" } }),
                 _vm._v(" Delete\n                ")
@@ -42268,7 +42323,15 @@ var render = function() {
       ),
       _vm._v(" "),
       _vm._l(_vm.todos, function(todo) {
-        return _c("todo-component", { key: todo.id, attrs: { todo: todo } })
+        return _c("todo-component", {
+          key: todo.id,
+          attrs: { todo: todo, token: _vm.user.api_token },
+          on: {
+            updateFormState: _vm.updateFormState,
+            showModal: _vm.showModal,
+            getTodos: _vm.getTodos
+          }
+        })
       }),
       _vm._v(" "),
       _c(
