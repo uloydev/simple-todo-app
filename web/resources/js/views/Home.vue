@@ -8,7 +8,7 @@
             :key="todo.id" 
             :todo="todo"
             @updateFormState="updateFormState"
-            @showModal="showModal"
+            @showUpdateModal="showUpdateModal"
             @getTodos="getTodos"
             :token="user.api_token"
         ></todo-component>
@@ -17,7 +17,9 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createTodoLabel">Modal title</h5>
+                        <h5 class="modal-title" id="createTodoLabel">
+                            {{isUpdateForm ? 'Update Todo' : 'Create Todo'}}
+                        </h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -53,6 +55,7 @@
             return {
                 todos: [],
                 inputBody: '',
+                inputTodoId: '',
                 apiData: {
                     api_token: ''
                 },
@@ -66,7 +69,6 @@
         methods: {
             getTodos(){
                 var data = this.apiData
-                console.log(data);
                 axios.get('/api/todos',{
                     headers: {
                         Authorization: 'Bearer ' + this.user.api_token
@@ -109,14 +111,37 @@
                     }
                 });
             },
-            updateTodo (todo) {
-
+            updateTodo () {
+                var data = this.apiData;
+                data.body = this.inputBody;
+                this.inputBody = '';
+                $('#createTodo').modal('hide');
+                axios.put('/api/todos/' + this.inputTodoId, data).then(response => {
+                    this.getTodos();
+                    Swal.fire('Success', response.data.message, 'success');
+                })
+                .catch(error => {
+                    if (error.response.data.errors){
+                        let errors = error.response.data.errors;
+                        let html = '<ul class="text-danger">';
+                        errors.forEach(item => {
+                            html += '<li>' + item + '</li>';
+                        });
+                        html += '</ul>';
+                        Swal.fire('Error', html, 'error');
+                    }
+                });
+                this.inputTodoId = '';
             },
-            showModal () {
-
+            showUpdateModal (todo) {
+                this.inputBody = todo.body;
+                this.inputTodoId = todo.id;
+                $('#createTodo').modal('show');
             },
             updateFormState (val) {
                 this.isUpdateForm = val;
+                this.inputBody = '';
+                console.log(this.isUpdateForm);
             }
         }
     }

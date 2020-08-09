@@ -12,8 +12,8 @@
                     <button class="dropdown-item bg-success my-2" @click="finishTodo">
                         <box-icon name='check' animation='tada' ></box-icon> Finish
                     </button>
-                    <button class="dropdown-item bg-warning my-2">
-                        <box-icon name='edit-alt' animation='tada' ></box-icon> Edit
+                    <button class="dropdown-item bg-warning my-2" @click="updateTodo">
+                        <box-icon name='edit-alt' animation='tada'></box-icon> Edit
                     </button>
                     <button class="dropdown-item bg-danger my-2" @click="deleteTodo">
                         <box-icon name='trash' animation='tada' ></box-icon> Delete
@@ -56,7 +56,6 @@
                             this.$emit('getTodos');
                         })
                         .catch(error => {
-                            console.log(error.response)
                             if (error.response.data.errors){
                                 let errors = error.response.data.errors;
                                 let html = '<ul class="text-danger">';
@@ -81,7 +80,6 @@
                     );
                     this.$emit('getTodos');
                 }).catch(error => {
-                    console.log(error.response)
                     if (error.response.data.errors){
                         let errors = error.response.data.errors;
                         let html = '<ul class="text-danger">';
@@ -92,6 +90,10 @@
                         Swal.fire('Error', html, 'error');
                     }
                 });
+            },
+            updateTodo () {
+                this.$emit('updateFormState', true);
+                this.$emit('showUpdateModal', this.todo);
             }
         }
     }

@@ -1986,8 +1986,6 @@ __webpack_require__.r(__webpack_exports__);
 
             _this.$emit('getTodos');
           })["catch"](function (error) {
-            console.log(error.response);
-
             if (error.response.data.errors) {
               var errors = error.response.data.errors;
               var html = '<ul class="text-danger">';
@@ -2011,8 +2009,6 @@ __webpack_require__.r(__webpack_exports__);
 
         _this2.$emit('getTodos');
       })["catch"](function (error) {
-        console.log(error.response);
-
         if (error.response.data.errors) {
           var errors = error.response.data.errors;
           var html = '<ul class="text-danger">';
@@ -2023,6 +2019,10 @@ __webpack_require__.r(__webpack_exports__);
           sweetalert2__WEBPACK_IMPORTED_MODULE_0___default.a.fire('Error', html, 'error');
         }
       });
+    },
+    updateTodo: function updateTodo() {
+      this.$emit('updateFormState', true);
+      this.$emit('showUpdateModal', this.todo);
     }
   }
 });
@@ -2204,6 +2204,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2216,6 +2218,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       todos: [],
       inputBody: '',
+      inputTodoId: '',
       apiData: {
         api_token: ''
       },
@@ -2231,7 +2234,6 @@ __webpack_require__.r(__webpack_exports__);
       var _this = this;
 
       var data = this.apiData;
-      console.log(data);
       axios.get('/api/todos', {
         headers: {
           Authorization: 'Bearer ' + this.user.api_token
@@ -2273,10 +2275,39 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
-    updateTodo: function updateTodo(todo) {},
-    showModal: function showModal() {},
+    updateTodo: function updateTodo() {
+      var _this3 = this;
+
+      var data = this.apiData;
+      data.body = this.inputBody;
+      this.inputBody = '';
+      $('#createTodo').modal('hide');
+      axios.put('/api/todos/' + this.inputTodoId, data).then(function (response) {
+        _this3.getTodos();
+
+        sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Success', response.data.message, 'success');
+      })["catch"](function (error) {
+        if (error.response.data.errors) {
+          var errors = error.response.data.errors;
+          var html = '<ul class="text-danger">';
+          errors.forEach(function (item) {
+            html += '<li>' + item + '</li>';
+          });
+          html += '</ul>';
+          sweetalert2__WEBPACK_IMPORTED_MODULE_1___default.a.fire('Error', html, 'error');
+        }
+      });
+      this.inputTodoId = '';
+    },
+    showUpdateModal: function showUpdateModal(todo) {
+      this.inputBody = todo.body;
+      this.inputTodoId = todo.id;
+      $('#createTodo').modal('show');
+    },
     updateFormState: function updateFormState(val) {
       this.isUpdateForm = val;
+      this.inputBody = '';
+      console.log(this.isUpdateForm);
     }
   }
 });
@@ -42092,7 +42123,10 @@ var render = function() {
             _vm._v(" "),
             _c(
               "button",
-              { staticClass: "dropdown-item bg-warning my-2" },
+              {
+                staticClass: "dropdown-item bg-warning my-2",
+                on: { click: _vm.updateTodo }
+              },
               [
                 _c("box-icon", {
                   attrs: { name: "edit-alt", animation: "tada" }
@@ -42359,7 +42393,7 @@ var render = function() {
           attrs: { todo: todo, token: _vm.user.api_token },
           on: {
             updateFormState: _vm.updateFormState,
-            showModal: _vm.showModal,
+            showUpdateModal: _vm.showUpdateModal,
             getTodos: _vm.getTodos
           }
         })
@@ -42381,7 +42415,26 @@ var render = function() {
         [
           _c("div", { staticClass: "modal-dialog" }, [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(0),
+              _c("div", { staticClass: "modal-header" }, [
+                _c(
+                  "h5",
+                  {
+                    staticClass: "modal-title",
+                    attrs: { id: "createTodoLabel" }
+                  },
+                  [
+                    _vm._v(
+                      "\n                        " +
+                        _vm._s(
+                          _vm.isUpdateForm ? "Update Todo" : "Create Todo"
+                        ) +
+                        "\n                    "
+                    )
+                  ]
+                ),
+                _vm._v(" "),
+                _vm._m(0)
+              ]),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "form-group" }, [
@@ -42472,26 +42525,18 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "modal-header" }, [
-      _c(
-        "h5",
-        { staticClass: "modal-title", attrs: { id: "createTodoLabel" } },
-        [_vm._v("Modal title")]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "close",
-          attrs: {
-            type: "button",
-            "data-dismiss": "modal",
-            "aria-label": "Close"
-          }
-        },
-        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
-      )
-    ])
+    return _c(
+      "button",
+      {
+        staticClass: "close",
+        attrs: {
+          type: "button",
+          "data-dismiss": "modal",
+          "aria-label": "Close"
+        }
+      },
+      [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+    )
   }
 ]
 render._withStripped = true
