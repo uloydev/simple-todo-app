@@ -13,7 +13,7 @@ class HomeBodyWrapper extends StatelessWidget {
       margin: EdgeInsets.only(top: 25),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.elliptical(75, 50)),
+        borderRadius: BorderRadius.vertical(top: Radius.elliptical(35, 35)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withOpacity(0.2),

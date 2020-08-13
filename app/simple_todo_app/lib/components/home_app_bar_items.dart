@@ -28,7 +28,7 @@ final String title;
             title,
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              fontSize: 40,
+              fontSize: 30,
             ),
           ),
           FloatingActionButton(

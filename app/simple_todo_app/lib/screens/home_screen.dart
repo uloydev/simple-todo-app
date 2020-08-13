@@ -39,12 +39,14 @@ class _HomeScreenState extends State<HomeScreen> {
               color: Colors.white,
             ),
           ],
-          onTap: (index){
-            setState(() {
-              activeIndex = index;
-            });
-          },
+          onTap: onBottomNavTap,
       ),
     );
   }
+
+  void onBottomNavTap(index){
+          setState(() {
+            activeIndex = index;
+          });
+        }
 }
