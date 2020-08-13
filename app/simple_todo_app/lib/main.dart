@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:simple_todo_app/screens/home_screen.dart';
 import 'package:simple_todo_app/screens/login_screen.dart';
 
 void main() {
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(fontFamily: 'Montserrat'),
       title: 'Simple TODO App',
-      home: LoginScreen(),
+      home: HomeScreen(),
       color: Colors.blueGrey,
     );
   }
