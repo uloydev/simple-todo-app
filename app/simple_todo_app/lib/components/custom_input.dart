@@ -17,7 +17,7 @@ class CustomInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       borderRadius: BorderRadius.circular(10),
-      color: Colors.lightBlue,
+      color: Colors.blueAccent[100],
       elevation: 10,
       child: Container(
           padding:
