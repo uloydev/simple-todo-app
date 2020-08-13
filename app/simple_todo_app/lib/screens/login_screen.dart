@@ -38,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: screenSize.height * 0.25),
+                SizedBox(height: screenSize.height * 0.175),
                 FadeAnimation(
                   delay: 500,
                   child: CustomInput(
