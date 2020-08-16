@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
 class HomeAppBarItems extends StatelessWidget {
-  const HomeAppBarItems({
-    Key key, this.title
-  }) : super(key: key);
+  const HomeAppBarItems({Key key, this.title}) : super(key: key);
 
-final String title;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +29,24 @@ final String title;
               fontSize: 30,
             ),
           ),
-          FloatingActionButton(
-            onPressed: () {},
-            tooltip: 'logout',
-            child: Icon(
-              Icons.exit_to_app,
-              size: 30,
-            ),
-            elevation: 0,
-            highlightElevation: 0,
+          Row(
+            children: [
+              FloatingActionButton(
+                onPressed: () {},
+                tooltip: 'logout',
+                child: Icon(
+                  Icons.exit_to_app,
+                  size: 30,
+                ),
+                elevation: 0,
+                highlightElevation: 0,
+              ),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {},
+                color: Colors.amber,
+              ),
+            ],
           ),
         ],
       ),
